@@ -37,6 +37,6 @@ CD28 at NCBI
 
 Ensembl:
 CD28 at Ensembl
-
+ 
 UCSC Genome Browser:
 Search for CD28, select the transcript, then export as FASTA.
