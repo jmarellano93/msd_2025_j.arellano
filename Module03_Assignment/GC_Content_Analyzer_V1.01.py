@@ -138,23 +138,40 @@ def load_fasta_file():
 
             if not os.path.isfile(filepath):
                 raise FileNotFoundError("The file was not found.")
-            if os.path.getsize(filepath) > 1 * 1024 * 1024 * 1024:  # 1 GB
+            if os.path.getsize(filepath) > 1 * 1024 * 1024 * 1024:
                 raise ValueError("File exceeds 1GB. Please use a smaller file.")
 
+            sequences = {}
+            current_header = None
+            current_sequence = []
+
             with open(filepath, 'r') as file:
-                header = file.readline().strip()
-                if not header.startswith(">"):
-                    raise ValueError("The FASTA file must start with a header line beginning with '>'")
-
-                sequence = []
                 for line in file:
-                    sequence.append(line.strip().upper())
+                    line = line.strip()
+                    if not line:
+                        continue
+                    if line.startswith(">"):
+                        if current_header:
+                            full_seq = ''.join(current_sequence).upper()
+                            if not all(base in "ATCGN" for base in full_seq):
+                                raise ValueError(f"Invalid DNA characters in sequence: {current_header}")
+                            sequences[current_header] = full_seq
+                        current_header = line
+                        current_sequence = []
+                    else:
+                        current_sequence.append(line)
 
-            flat_sequence = ''.join(sequence)
-            if not all(base in "ATCGN" for base in flat_sequence):
-                raise ValueError("Invalid characters found in DNA sequence.")
+                # Add the last sequence
+                if current_header:
+                    full_seq = ''.join(current_sequence).upper()
+                    if not all(base in "ATCGN" for base in full_seq):
+                        raise ValueError(f"Invalid DNA characters in sequence: {current_header}")
+                    sequences[current_header] = full_seq
 
-            return header, flat_sequence
+            if not sequences:
+                raise ValueError("No sequences found in the FASTA file.")
+
+            return sequences
         except Exception as e:
             print(f"\nError: {e}\nPlease try again.\n")
 
@@ -170,20 +187,23 @@ def main():
 
         if choice == 'A':
             header, sequence = get_user_sequence()
+            sequences = {header: sequence}
         elif choice == 'B':
-            header, sequence = load_fasta_file()
+            sequences = load_fasta_file()
         elif choice == 'C':
             header, sequence = generate_random_sequence()
+            sequences = {header: sequence}
         else:
             print("Invalid input. Please enter 'A', 'B', or 'C'.")
             return
 
-        gc_content = calculate_gc_content(sequence)
-        print(f"\nGC-content: {gc_content:.6f}%")
+        print("\nGC-content analysis results:")
+        for header, sequence in sequences.items():
+            gc_content = calculate_gc_content(sequence)
+            print(f"{header}\nGC-content: {gc_content:.6f}%\n")
 
     except Exception as e:
         print(f"\nError: {e}")
-
 
 if __name__ == "__main__":
     main()
