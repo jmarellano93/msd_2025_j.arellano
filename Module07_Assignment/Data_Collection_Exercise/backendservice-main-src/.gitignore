@@ -8,22 +8,15 @@ __pycache__/
 .Python
 
 # IDE specific
-.idea/
-.vscode/
-*.sublime-project
-*.sublime-workspace
 
 # Coverage reports
 .coverage
 htmlcov/
 
 # Log files
-*.log
 
 # Data files (optional, depends if you want to version example data)
-# patients.json
-# experiments.json
-# data.json
+
 
 # OS generated files
 .DS_Store
