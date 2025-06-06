@@ -35,6 +35,3 @@ dist/
 *.swp
 .DS_Store
 Thumbs.db
-
-#Random Files to ignore
-Design_Pattern_Exercise_False/

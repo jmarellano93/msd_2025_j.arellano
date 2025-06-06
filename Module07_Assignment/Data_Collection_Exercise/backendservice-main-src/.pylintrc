@@ -1,0 +1,5 @@
+# Example.pylintrc content
+
+# Add other specific message IDs to disable as needed.
+
+# max-line-length=100 # Example: increase max line length
