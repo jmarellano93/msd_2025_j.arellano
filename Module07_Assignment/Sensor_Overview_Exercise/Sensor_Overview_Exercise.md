@@ -94,9 +94,9 @@ Once the build is successful, the application can be deployed to the device.
 3. Interpreting Output:
 - Upon launching, the application will display a vertically scrollable list of sensor names. This list represents all sensors that the Android system on the specific Samsung S20+ 5G device reports as available.
 
-D. Addressing the Exercise Questions
+D. Exercise Answers
 
-With the application running, the exercise questions can now be answered.
+![screenshot.png](screenshot.png)
 
 1. What type/model of Android device are you using?
 - Samsung S20+ 5G, Model: SM-G986B/DS.
@@ -130,7 +130,7 @@ With the application running, the exercise questions can now be answered.
 | Orientation Sensor                               | `Sensor.TYPE_ORIENTATION` (deprecated)      | Computes azimuth, pitch, and roll. Deprecated—use fused sensor alternatives.             |
 
 
-4. "Which sensor could be used to measure Parkinson’s disease?"
+4. Which sensor could be used to measure Parkinson’s disease?
 
 - Primary Sensors:
 

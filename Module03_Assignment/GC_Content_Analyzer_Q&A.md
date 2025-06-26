@@ -1,3 +1,4 @@
+
 1) What is the GC-content value of the Human Gene CD28?
 
 According to my GC-content analysis of the NG_029618.1 RefSeqGene retrieved from https://www.ncbi.nlm.nih.gov/gene/940, 

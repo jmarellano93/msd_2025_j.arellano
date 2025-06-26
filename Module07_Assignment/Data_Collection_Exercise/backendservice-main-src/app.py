@@ -520,7 +520,7 @@ if __name__ == '__main__':
     except Exception as e:
         module_logger.error(f"Error loading initial data: {e}", exc_info=True)
 
-    SERVICE_PORT = 5000
+    SERVICE_PORT = 8080
     if env_variables and 'port' in env_variables:
         try:
             SERVICE_PORT = int(env_variables['port'])

@@ -450,17 +450,16 @@ class DataStorage:
         if os.path.exists(patient_file):
             try:
                 with open(patient_file, 'r', encoding='utf-8') as file:
-                    patient_data_dict = json.load(file) # {patient_id: patient_dict}
+                    patient_data_dict = json.load(file)
                 for pid, p_details in patient_data_dict.items():
                     name = p_details.pop('name', 'Unknown')
-                    # p_details.pop('id', None) # id from dict key 'pid' is authoritative
                     self.patients[pid] = Patient(name=name, patient_id=pid, **p_details)
                 module_logger.info(f"{len(self.patients)} patients loaded.")
-            except Exception as e: # Catching a broader exception during file load
+            except Exception as e:
                 module_logger.error(
                     f"Error loading or parsing {patient_file}: {e}", exc_info=True
                 )
-                self.patients.clear() # Clear partially loaded data
+                self.patients.clear()
         else:
             module_logger.info(f"{patient_file} not found. No patients loaded.")
 
@@ -468,10 +467,9 @@ class DataStorage:
         if os.path.exists(experiment_file):
             try:
                 with open(experiment_file, 'r', encoding='utf-8') as file:
-                    exp_data_dict = json.load(file) # {experiment_id: experiment_dict}
+                    exp_data_dict = json.load(file)
                 for eid, e_details in exp_data_dict.items():
                     name = e_details.pop('name', 'Unknown Experiment')
-                    # e_details.pop('id', None)
                     self.experiments[eid] = Experiment(
                         name=name, experiment_id=eid, **e_details
                     )
@@ -488,38 +486,76 @@ class DataStorage:
         if os.path.exists(data_points_file):
             try:
                 with open(data_points_file, 'r', encoding='utf-8') as file:
-                    dp_data_dict = json.load(file) # {dp_id: dp_object_dict}
-                for dp_id, dp_details in dp_data_dict.items():
-                    pat_id = dp_details.get('patient_id')
-                    exp_id = dp_details.get('experiment_id')
-                    payload = dp_details.get('data')
+                    dp_data_raw = json.load(file)
 
-                    if pat_id and exp_id and isinstance(payload, dict):
-                        if pat_id not in self.patients:
-                            module_logger.warning(
-                                f"Skipping data point (ID: {dp_id}): "
-                                f"Associated patient ID '{pat_id}' not found."
-                            )
-                            continue
-                        if exp_id not in self.experiments:
-                            module_logger.warning(
-                                f"Skipping data point (ID: {dp_id}): "
-                                f"Associated experiment ID '{exp_id}' not found."
-                            )
-                            continue
+                if isinstance(dp_data_raw, list):
+                    for dp_details in dp_data_raw:
+                        dp_id = dp_details.get('id') or idgenerator.AlphaNumericIDGenerator().get_id()
+                        pat_id = dp_details.get('patient_id')
+                        exp_id = dp_details.get('experiment_id')
+                        payload = dp_details.get('data')
 
-                        self.data_points[dp_id] = DataPoint(
-                            patient_id=pat_id,
-                            experiment_id=exp_id,
-                            data_payload=payload,
-                            data_point_id=dp_id # Use dp_id from file as the ID
-                        )
-                    else:
-                        module_logger.warning(
-                            f"Skipping invalid data point entry (ID: {dp_id}): "
-                            f"Missing required fields or invalid payload type in "
-                            f"{data_points_file}"
-                        )
+                        if pat_id and exp_id and isinstance(payload, dict):
+                            if pat_id not in self.patients:
+                                module_logger.warning(
+                                    f"Skipping data point (ID: {dp_id}): "
+                                    f"Associated patient ID '{pat_id}' not found."
+                                )
+                                continue
+                            if exp_id not in self.experiments:
+                                module_logger.warning(
+                                    f"Skipping data point (ID: {dp_id}): "
+                                    f"Associated experiment ID '{exp_id}' not found."
+                                )
+                                continue
+
+                            self.data_points[dp_id] = DataPoint(
+                                patient_id=pat_id,
+                                experiment_id=exp_id,
+                                data_payload=payload,
+                                data_point_id=dp_id
+                            )
+                        else:
+                            module_logger.warning(
+                                f"Skipping invalid data point entry (ID: {dp_id}): "
+                                f"Missing required fields or invalid payload type in "
+                                f"{data_points_file}"
+                            )
+                elif isinstance(dp_data_raw, dict):
+                    for dp_id, dp_details in dp_data_raw.items():
+                        pat_id = dp_details.get('patient_id')
+                        exp_id = dp_details.get('experiment_id')
+                        payload = dp_details.get('data')
+
+                        if pat_id and exp_id and isinstance(payload, dict):
+                            if pat_id not in self.patients:
+                                module_logger.warning(
+                                    f"Skipping data point (ID: {dp_id}): "
+                                    f"Associated patient ID '{pat_id}' not found."
+                                )
+                                continue
+                            if exp_id not in self.experiments:
+                                module_logger.warning(
+                                    f"Skipping data point (ID: {dp_id}): "
+                                    f"Associated experiment ID '{exp_id}' not found."
+                                )
+                                continue
+
+                            self.data_points[dp_id] = DataPoint(
+                                patient_id=pat_id,
+                                experiment_id=exp_id,
+                                data_payload=payload,
+                                data_point_id=dp_id
+                            )
+                        else:
+                            module_logger.warning(
+                                f"Skipping invalid data point entry (ID: {dp_id}): "
+                                f"Missing required fields or invalid payload type in "
+                                f"{data_points_file}"
+                            )
+                else:
+                    module_logger.warning(f"Unexpected data format in {data_points_file}. Expected dict or list.")
+
                 module_logger.info(f"{len(self.data_points)} data points loaded.")
             except Exception as e:
                 module_logger.error(

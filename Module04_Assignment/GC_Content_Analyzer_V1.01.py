@@ -1,4 +1,5 @@
 '''
+
 --------------------DNA Sequences in FASTA Format Preface--------------------
 
 FASTA format is a simple and widely used text-based format for representing

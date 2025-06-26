@@ -1,4 +1,3 @@
-# Questions/Discussions
 
 1. Is the filename hardcoded?
 
