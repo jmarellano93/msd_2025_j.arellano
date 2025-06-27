@@ -55,7 +55,7 @@ class DataPoint:
     def __init__(self,
                  patient_id,
                  experiment_id,
-                 data_payload,
+                 data_payload,  # This will now be the individual data object from the app
                  data_point_id=None):
         if (not patient_id or
                 not experiment_id or
@@ -68,7 +68,9 @@ class DataPoint:
                    else idgenerator.AlphaNumericIDGenerator().get_id())
         self.patient_id = patient_id
         self.experiment_id = experiment_id
-        self.data = data_payload # This is the 'submitted_data' or general payload
+        # The entire data_payload from the app is stored in the 'data' field.
+        # This preserves the full structure sent by the client.
+        self.data = data_payload
         module_logger.debug(
             f"DataPoint initialized: ID '{self.id}' for Patient '{patient_id}', "
             f"Exp '{experiment_id}'"
